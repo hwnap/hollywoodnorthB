@@ -5,7 +5,7 @@ const tireSchema = new mongoose.Schema({
   size: String,
   treadCondition: String,
   status: { type: String, enum: ['posted', 'not posted', 'sold', 'not sold'] },
-  imageBase64: String
+  imageUrl: String // Changed from imageBase64 to imageUrl
 });
 
 module.exports = mongoose.model('Tire', tireSchema);
