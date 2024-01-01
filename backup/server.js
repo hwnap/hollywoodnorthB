@@ -10,11 +10,11 @@ const tireRoutes = require('./routes/tires');
 const app = express();
 
 // Middleware for parsing JSON data
-app.use(express.json());
-const corsOptions = {
-  origin: 'https://hw-frontend1.vercel.app/', // Replace with your frontend's URL
-  optionsSuccessStatus: 200
-};
+// app.use(express.json());
+// const corsOptions = {
+//   origin: 'https://hw-frontend1.vercel.app/', // Replace with your frontend's URL
+//   optionsSuccessStatus: 200
+// };
 
 app.use(cors(corsOptions));
 
