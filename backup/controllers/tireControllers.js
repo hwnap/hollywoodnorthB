@@ -13,13 +13,11 @@ exports.addTire = async (req, res) => {
   try {
     const newTire = new Tire(req.body);
     await newTire.save();
-    res.status(201).json(newTire);
+    res.status(201).send(newTire);
   } catch (error) {
-    console.error('Error adding tire:', error);
-    res.status(500).json({ message: error.message });
+    res.status(500).send(error.message);
   }
 };
-
 
 exports.findTiresBySize = async (req, res) => {
     try {
@@ -64,23 +62,3 @@ exports.updateTireStatus = async (req, res) => {
       res.status(500).send(error.message);
     }
   };
-
-  // In your tireControllers.js or equivalent
-exports.updateTire = async (req, res) => {
-  try {
-    const tireId = req.params.id;
-    if (!tireId) {
-      return res.status(400).send('Tire ID is missing');
-    }
-    const updatedData = req.body;
-    const updatedTire = await Tire.findByIdAndUpdate(tireId, updatedData, { new: true });
-    if (!updatedTire) {
-      return res.status(404).send('Tire not found');
-    }
-    res.status(200).json(updatedTire);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-  
