@@ -16,7 +16,7 @@ const app = express();
 //   optionsSuccessStatus: 200
 // };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
