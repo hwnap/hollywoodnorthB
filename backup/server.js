@@ -1,34 +1,24 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const cors = require('cors');
 const dotenv = require('dotenv');
+const connectDB = require('./config/db'); // Assuming you have a db.js for MongoDB connection
 
 // Load environment variables
 dotenv.config();
 
-const tireRoutes = require('./routes/tires');
+// Connect to MongoDB
+connectDB();
 
+const tireRoutes = require('./routes/tires');
 const app = express();
 
-// Enable CORS for all origins (for development)
-// app.use(cors());
+// Enable CORS for your frontend
+app.use(cors({
+  origin: 'https://hw-frontend1.onrender.com' 
+}));
 
 // Middleware for parsing JSON data
-// app.use(express.json());
-// const corsOptions = {
-//   origin: 'https://hw-frontend1.vercel.app/', // Replace with your frontend's URL
-//   optionsSuccessStatus: 200
-// };
-
-// app.use(cors(corsOptions));
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log('MongoDB connection established'))
-  .catch(err => console.error('MongoDB connection error:', err));
-  
+app.use(express.json());
 
 // Routes
 app.use('/api/tires', tireRoutes);
