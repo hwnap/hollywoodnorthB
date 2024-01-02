@@ -62,17 +62,3 @@ exports.updateTireStatus = async (req, res) => {
       res.status(500).send(error.message);
     }
   };
-
-  // In your tireControllers.js or equivalent file
-exports.deleteTire = async (req, res) => {
-  try {
-      const tireId = req.params.id;
-      const tire = await Tire.findByIdAndDelete(tireId);
-      if (!tire) {
-          return res.status(404).send('Tire not found');
-      }
-      res.status(200).send('Tire deleted');
-  } catch (error) {
-      res.status(500).send(error.message);
-  }
-};
