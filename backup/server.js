@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db'); // Import the database connection function
 
 // Load environment variables
 dotenv.config();
