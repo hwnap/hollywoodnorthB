@@ -8,5 +8,7 @@ router.get('/', tireController.getAllTires);
 router.get('/search', tireController.searchTires);
 router.put('/:id/status', tireController.updateTireStatus);
 router.post('/', tireController.addTire);
+router.delete('/:id', tireController.deleteTire);
+
 
 module.exports = router;
