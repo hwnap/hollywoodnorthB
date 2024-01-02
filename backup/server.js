@@ -10,7 +10,7 @@ const tireRoutes = require('./routes/tires');
 const app = express();
 
 // Enable CORS for all origins (for development)
-app.use(cors());
+// app.use(cors());
 
 // Middleware for parsing JSON data
 // app.use(express.json());
