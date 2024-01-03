@@ -23,7 +23,9 @@ const tireSchema = new mongoose.Schema({
   season: { 
     type: String, 
     enum: ['All Season', 'Summer', 'Winter'] 
-  }
+  },
+  price: Number,
+  notes: String,
 });
 
 module.exports = mongoose.model('Tire', tireSchema);
