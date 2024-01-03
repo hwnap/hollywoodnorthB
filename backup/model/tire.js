@@ -5,7 +5,7 @@ const tireSchema = new mongoose.Schema({
   size: String,
   treadCondition: { 
     type: String, 
-    enum: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'] 
+    enum: ['60%', '65%', '70%', '75%', '80%', '85%', '90%', '95%', '100%']
   },
   status: { 
     type: String, 
