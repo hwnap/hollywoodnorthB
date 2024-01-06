@@ -85,4 +85,23 @@ exports.updateTireStatus = async (req, res) => {
   }
 };
 
+exports.getTireSizes = async (req, res) => {
+  try {
+    const sizes = await Tire.distinct("size");
+    res.json(sizes);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+exports.getTireBrands = async (req, res) => {
+  try {
+    const brands = await Tire.distinct("brand");
+    res.json(brands);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+
 module.exports = exports;
