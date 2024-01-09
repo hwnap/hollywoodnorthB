@@ -1,5 +1,6 @@
 // controllers/tireControllers.js
 const Tire = require('../model/tire'); // Update the path as needed
+const TireSale = require('../model/TireSale');
 
 exports.getAllTires = async (req, res) => {
   try {
@@ -74,11 +75,24 @@ exports.updateTireStatus = async (req, res) => {
     const tireId = req.params.id;
     const update = { status: req.body.status };
 
-    if (req.body.status === 'sold') {
-      update.imageBase64 = ''; // Remove the image for sold items
+    // First update the tire status
+    const updatedTire = await Tire.findByIdAndUpdate(tireId, update, { new: true });
+    if (!updatedTire) {
+      return res.status(404).send('Tire not found');
     }
 
-    const updatedTire = await Tire.findByIdAndUpdate(tireId, update, { new: true });
+    // If the status is 'sold', create a new TireSale record
+    if (req.body.status === 'sold') {
+      update.soldDate = new Date();
+      const newSale = new TireSale({
+        tireId: tireId,
+        size: updatedTire.size,
+        soldPrice: updatedTire.price,
+        soldDate: new Date() // Ensure the soldDate is set to the current date/time
+      });
+      await newSale.save();
+    }
+
     res.json(updatedTire);
   } catch (error) {
     res.status(500).send(error.message);

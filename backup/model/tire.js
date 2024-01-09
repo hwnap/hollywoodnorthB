@@ -26,6 +26,7 @@ const tireSchema = new mongoose.Schema({
   },
   price: Number,
   notes: String,
+  soldDate: Date
 });
 
 module.exports = mongoose.model('Tire', tireSchema);
