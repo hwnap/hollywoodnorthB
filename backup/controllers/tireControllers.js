@@ -45,19 +45,33 @@ exports.deleteTire = async (req, res) => {
   }
 };
 
+
 exports.searchTires = async (req, res) => {
   try {
-    const query = {};
-    if (req.query.size) query.size = req.query.size;
-    if (req.query.brand) query.brand = req.query.brand;
-    // Add more query parameters as needed
+      const query = {};
+      if (req.query.size) query.size = req.query.size;
+      if (req.query.brand) query.brand = req.query.brand;
 
-    const tires = await Tire.find(query);
-    res.json(tires);
+      // Sorting logic
+      let sort = {};
+      if (req.query.sortBy) {
+          const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
+          sort[req.query.sortBy] = sortOrder;
+
+          // If sorting by price, add a secondary sort criteria
+          if (req.query.sortBy === 'price') {
+              sort['_id'] = 1; // Replace '_id' with 'createdAt' if you have a timestamp
+          }
+      }
+
+      const tires = await Tire.find(query).sort(sort);
+      res.json(tires);
   } catch (error) {
-    res.status(500).send(error.message);
+      res.status(500).send(error.message);
   }
 };
+
+
 
 // Other functions you provided earlier
 exports.findTiresBySize = async (req, res) => {
