@@ -6,4 +6,6 @@ const userSchema = new mongoose.Schema({
     role: { type: String, default: 'customer' } // 'customer' or 'employee'
 });
 
+userSchema.index({ username: 1 });
+
 module.exports = mongoose.model('User', userSchema);

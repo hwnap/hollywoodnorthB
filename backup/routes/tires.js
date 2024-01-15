@@ -12,5 +12,7 @@ router.delete('/:id', tireController.deleteTire);
 router.put('/:id', tireController.updateTire);
 router.get('/sizes', tireController.getTireSizes);
 router.get('/brands', tireController.getTireBrands);
+router.put('/:id/not-sold', tireController.markTireAsNotSold);
+
 
 module.exports = router;

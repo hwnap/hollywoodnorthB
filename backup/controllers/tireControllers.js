@@ -1,6 +1,7 @@
 // controllers/tireControllers.js
 const Tire = require('../model/tire'); // Update the path as needed
 const TireSale = require('../model/TireSale');
+const User = require('../model/User');
 
 exports.getAllTires = async (req, res) => {
   try {
@@ -85,24 +86,32 @@ exports.findTiresBySize = async (req, res) => {
 };
 
 exports.updateTireStatus = async (req, res) => {
+  console.log(req.body); 
   try {
     const tireId = req.params.id;
-    const update = { status: req.body.status };
-
+    const { status, username } = req.body; // Change from userId to username
+    
     // First update the tire status
-    const updatedTire = await Tire.findByIdAndUpdate(tireId, update, { new: true });
+    const updatedTire = await Tire.findByIdAndUpdate(tireId, { status }, { new: true });
     if (!updatedTire) {
       return res.status(404).send('Tire not found');
     }
 
     // If the status is 'sold', create a new TireSale record
-    if (req.body.status === 'sold') {
-      update.soldDate = new Date();
+    if (status === 'sold') {
+      // Find the user by username
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
       const newSale = new TireSale({
         tireId: tireId,
+        userId: user._id, // Save the user's ObjectId
+        username: user.username, 
         size: updatedTire.size,
         soldPrice: updatedTire.price,
-        soldDate: new Date() // Ensure the soldDate is set to the current date/time
+        soldDate: new Date()
       });
       await newSale.save();
     }
@@ -112,6 +121,7 @@ exports.updateTireStatus = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
 
 exports.getTireSizes = async (req, res) => {
   try {
@@ -131,5 +141,21 @@ exports.getTireBrands = async (req, res) => {
   }
 };
 
+//------------------------------------
+exports.markTireAsNotSold = async (req, res) => {
+  try {
+    const tireId = req.params.id;
+
+    // Remove the TireSale record
+    await TireSale.findOneAndDelete({ tireId: tireId });
+
+    // Update the tire status back to available (or your preferred status)
+    await Tire.findByIdAndUpdate(tireId, { status: 'available' });
+
+    res.status(200).json({ message: 'Tire marked as not sold and sale record removed.' });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
 
 module.exports = exports;

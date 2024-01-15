@@ -1,5 +1,5 @@
-// models/TireSale.js
 const mongoose = require('mongoose');
+const User = require('./User');
 
 const tireSaleSchema = new mongoose.Schema({
   tireId: {
@@ -7,10 +7,12 @@ const tireSaleSchema = new mongoose.Schema({
     ref: 'Tire',
     required: true
   },
-  soldDate: {
-    type: Date,
-    default: Date.now
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
+  username: String, 
+  soldDate: Date,
   size: String,
   soldPrice: Number
 });
