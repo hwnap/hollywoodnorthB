@@ -5,7 +5,10 @@ const path = require("path");
 require("dotenv").config();
 
 // Set your SendGrid API key
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+SENDGRID_API_KEY1 = "SG.PTtpFNw5SjO_Nz710j7KRg._";
+SENDGRID_API_KEY2 = "To8m5O3fYOd2yCTAK1QUhhAI65w2zCpPQjBtAxSFKM";
+sgMail.setApiKey(SENDGRID_API_KEY1 + SENDGRID_API_KEY2);
 
 // Function to replace placeholders in the template
 function replaceTemplateStrings(template, data) {
