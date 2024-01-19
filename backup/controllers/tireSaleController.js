@@ -1,212 +1,134 @@
-// controllers/tireControllers.js
-const Tire = require("../model/tire"); // Update the path as needed
 const TireSale = require("../model/TireSale");
 const User = require("../model/User");
+const mongoose = require("mongoose");
+const dayjs = require("dayjs");
 
-exports.getAllTires = async (req, res) => {
+exports.getTotalSales = async (req, res) => {
   try {
-    const tires = await Tire.find({});
-    res.json(tires);
+    const totalSales = await TireSale.aggregate([
+      { $group: { _id: null, totalSales: { $sum: "$soldPrice" } } },
+    ]);
+
+    res.json({ totalSales: totalSales[0] ? totalSales[0].totalSales : 0 });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
-exports.addTire = async (req, res) => {
-  try {
-    const newTire = new Tire(req.body);
-    await newTire.save();
-    res.status(201).json(newTire);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.updateTire = async (req, res) => {
-  try {
-    const tireId = req.params.id;
-    const updatedData = req.body;
-    const updatedTire = await Tire.findByIdAndUpdate(tireId, updatedData, {
-      new: true,
-    });
-    if (!updatedTire) {
-      return res.status(404).send("Tire not found");
-    }
-    res.status(200).json(updatedTire);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-exports.deleteTire = async (req, res) => {
-  try {
-    const tireId = req.params.id;
-    await Tire.findByIdAndDelete(tireId);
-    res.status(200).send("Tire deleted");
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-exports.searchTires = async (req, res) => {
-  try {
-    const query = {};
-    if (req.query.size) query.size = req.query.size;
-    if (req.query.brand) query.brand = req.query.brand;
-
-    // Sorting logic
-    let sort = {};
-    if (req.query.sortBy) {
-      const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
-      sort[req.query.sortBy] = sortOrder;
-
-      // If sorting by price, add a secondary sort criteria
-      if (req.query.sortBy === "price") {
-        sort["_id"] = 1; // Replace '_id' with 'createdAt' if you have a timestamp
-      }
-    }
-
-    const tires = await Tire.find(query).sort(sort);
-    res.json(tires);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-// Other functions you provided earlier
-exports.findTiresBySize = async (req, res) => {
-  try {
-    const size = req.query.size;
-    const tires = await Tire.find({ size });
-    res.json(tires);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-exports.updateTireStatus = async (req, res) => {
-  console.log(req.body);
-  try {
-    const tireId = req.params.id;
-    const { status, username } = req.body; // Change from userId to username
-
-    // First update the tire status
-    const updatedTire = await Tire.findByIdAndUpdate(
-      tireId,
-      { status },
-      { new: true }
-    );
-    if (!updatedTire) {
-      return res.status(404).send("Tire not found");
-    }
-
-    // If the status is 'sold', create a new TireSale record
-    if (status === "sold") {
-      // Find the user by username
-      const user = await User.findOne({ username: username });
-      if (!user) {
-        return res.status(404).send("User not found");
-      }
-
-      const newSale = new TireSale({
-        tireId: tireId,
-        userId: user._id, // Save the user's ObjectId
-        username: user.username,
-        size: updatedTire.size,
-        soldPrice: updatedTire.price,
-        soldDate: new Date(),
-      });
-      await newSale.save();
-    }
-
-    res.json(updatedTire);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-// exports.updateTireStatus = async (req, res) => {
+// exports.getAllSales = async (req, res) => {
 //   try {
-//     const tireId = req.params.id;
-//     const { status, username } = req.body;
+//     const sales = await TireSale.find({})
+//       .populate({
+//         path: "userId",
+//         select: "username", // Select only the username field from the User model
+//       })
+//       .populate("tireId", "brand size")
+//       .sort({ soldDate: -1 });
 
-//     let updateData = { status };
-
-//     // If the status is 'sold', set the soldDate and create a new TireSale record
-//     if (status === "sold") {
-//       updateData.soldDate = new Date(); // Set the sold date
-
-//       const user = await User.findOne({ username: username });
-//       if (!user) {
-//         return res.status(404).send("User not found");
-//       }
-
-//       // Find the tire to get the current price and size
-//       const tire = await Tire.findById(tireId);
-//       if (!tire) {
-//         return res.status(404).send("Tire not found");
-//       }
-
-//       const newSale = new TireSale({
-//         tireId: tireId,
-//         userId: user._id,
-//         username: user.username,
-//         size: tire.size,
-//         soldPrice: tire.price,
-//         soldDate: updateData.soldDate,
-//       });
-//       await newSale.save();
-//     }
-//     console.log(soldPrice);
-//     // Update the tire with the new data
-//     const updatedTire = await Tire.findByIdAndUpdate(tireId, updateData, {
-//       new: true,
-//     });
-//     if (!updatedTire) {
-//       return res.status(404).send("Tire not found");
-//     }
-
-//     res.json(updatedTire);
+//     res.json(sales);
 //   } catch (error) {
 //     res.status(500).send(error.message);
 //   }
 // };
 
-exports.getTireSizes = async (req, res) => {
+exports.getAllSales = async (req, res) => {
   try {
-    const sizes = await Tire.distinct("size");
-    res.json(sizes);
+    const sales = await TireSale.find({})
+      .populate({
+        path: "userId",
+        select: "username", // Select only the username field from the User model
+      })
+      .populate("tireId", "brand size soldDate")
+      .sort({ soldDate: -1 });
+
+    // Calculate days since sold for each sale
+    sales.forEach((sale) => {
+      sale.daysSinceSold = sale.tireId.soldDate
+        ? Math.floor(
+            (new Date() - new Date(sale.tireId.soldDate)) / (1000 * 3600 * 24)
+          )
+        : null;
+    });
+
+    res.json(sales);
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
-exports.getTireBrands = async (req, res) => {
+exports.getWeeklySales = async (req, res) => {
   try {
-    const brands = await Tire.distinct("brand");
-    res.json(brands);
+    const startDate = new Date(req.query.startDate);
+    const endDate = new Date(req.query.endDate);
+
+    const weeklySales = await TireSale.aggregate([
+      {
+        $match: {
+          soldDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$soldPrice" },
+        },
+      },
+    ]);
+
+    res.json({ weeklySales: weeklySales[0] ? weeklySales[0].totalSales : 0 });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
-//------------------------------------
-exports.markTireAsNotSold = async (req, res) => {
+exports.getMonthlySales = async (req, res) => {
   try {
-    const tireId = req.params.id;
+    const startDate = new Date(req.query.startDate);
+    const endDate = new Date(req.query.endDate);
 
-    // Remove the TireSale record
-    await TireSale.findOneAndDelete({ tireId: tireId });
+    const monthlySales = await TireSale.aggregate([
+      {
+        $match: {
+          soldDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$soldPrice" },
+        },
+      },
+    ]);
 
-    // Update the tire status back to available (or your preferred status)
-    await Tire.findByIdAndUpdate(tireId, { status: "available" });
-
-    res
-      .status(200)
-      .json({ message: "Tire marked as not sold and sale record removed." });
+    res.json({
+      monthlySales: monthlySales[0] ? monthlySales[0].totalSales : 0,
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
-module.exports = exports;
+exports.getReportsByDateRange = async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  try {
+    // Use dayjs to format startDate and endDate to 'YYYY-MM-DD' format
+    const start = dayjs(startDate).format("YYYY-MM-DD");
+    const end = dayjs(endDate).format("YYYY-MM-DD");
+
+    // Fetch reports within the specified date range
+    const reports = await TireSale.find({
+      soldDate: { $gte: start, $lte: end },
+    }).populate("userId", "username");
+
+    res.json(reports);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
