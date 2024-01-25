@@ -13,5 +13,6 @@ router.put("/:id", tireController.updateTire);
 router.get("/sizes", tireController.getTireSizes);
 router.get("/brands", tireController.getTireBrands);
 router.put("/:id/not-sold", tireController.markTireAsNotSold);
+router.get("/search-by-rsize", tireController.searchTiresByRSize);
 
 module.exports = router;

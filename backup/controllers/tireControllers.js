@@ -125,53 +125,6 @@ exports.updateTireStatus = async (req, res) => {
   }
 };
 
-// exports.updateTireStatus = async (req, res) => {
-//   try {
-//     const tireId = req.params.id;
-//     const { status, username } = req.body;
-
-//     let updateData = { status };
-
-//     // If the status is 'sold', set the soldDate and create a new TireSale record
-//     if (status === "sold") {
-//       updateData.soldDate = new Date(); // Set the sold date
-
-//       const user = await User.findOne({ username: username });
-//       if (!user) {
-//         return res.status(404).send("User not found");
-//       }
-
-//       // Find the tire to get the current price and size
-//       const tire = await Tire.findById(tireId);
-//       if (!tire) {
-//         return res.status(404).send("Tire not found");
-//       }
-
-//       const newSale = new TireSale({
-//         tireId: tireId,
-//         userId: user._id,
-//         username: user.username,
-//         size: tire.size,
-//         soldPrice: tire.price,
-//         soldDate: updateData.soldDate,
-//       });
-//       await newSale.save();
-//     }
-//     console.log(soldPrice);
-//     // Update the tire with the new data
-//     const updatedTire = await Tire.findByIdAndUpdate(tireId, updateData, {
-//       new: true,
-//     });
-//     if (!updatedTire) {
-//       return res.status(404).send("Tire not found");
-//     }
-
-//     res.json(updatedTire);
-//   } catch (error) {
-//     res.status(500).send(error.message);
-//   }
-// };
-
 exports.getTireSizes = async (req, res) => {
   try {
     const sizes = await Tire.distinct("size");
@@ -204,6 +157,36 @@ exports.markTireAsNotSold = async (req, res) => {
     res
       .status(200)
       .json({ message: "Tire marked as not sold and sale record removed." });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+//------------------------------------
+
+exports.searchTiresByRSize = async (req, res) => {
+  try {
+    const rSize = parseInt(req.query.rSize);
+    if (!rSize) {
+      return res.status(400).send("Invalid R size provided");
+    }
+
+    // Retrieve all tires
+    let tires = await Tire.find();
+
+    // Filter and sort tires based on the R size
+    tires = tires
+      .filter((tire) => {
+        const sizePart = tire.size.split("R")[1];
+        return sizePart && parseInt(sizePart) <= rSize;
+      })
+      .sort((a, b) => {
+        const sizeA = parseInt(a.size.split("R")[1]);
+        const sizeB = parseInt(b.size.split("R")[1]);
+        return sizeB - sizeA; // for descending order
+      });
+
+    res.json(tires);
   } catch (error) {
     res.status(500).send(error.message);
   }
