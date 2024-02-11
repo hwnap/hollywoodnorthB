@@ -30,7 +30,7 @@ const app = express();
 // Enable CORS for your frontend
 app.use(
   cors({
-    origin: "https://hw-frontend1.onrender.com",
+    origin: "https://hollywoodnorthautoparts.onrender.com",
   })
 );
 
